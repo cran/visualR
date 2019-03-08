@@ -1,0 +1,11 @@
+f41d10b057d96431223adfd6d34d4428 *DESCRIPTION
+e57c2191006ad523aa6bcee1062a12e0 *NAMESPACE
+1e787300182857835134c5f0539b54f6 *R/visual.R
+b777b9b199023bcd9c783020420e4acc *R/visualize.R
+b662cb8269b38b448e23f6010db41c71 *build/vignette.rds
+57cc6609f9ac99623d6b895ac3075c7f *inst/doc/visualr.R
+e6f85aa9b3165ae423367413b0fc191a *inst/doc/visualr.Rmd
+8c6258b54be7e82d1546891302dcd51d *inst/doc/visualr.html
+f98b0482e33c373e8c2c9aa40a4ead48 *man/visual.Rd
+b40448eca8db1b3cf85e6d40dbb2b1d7 *man/visualize.Rd
+e6f85aa9b3165ae423367413b0fc191a *vignettes/visualr.Rmd
