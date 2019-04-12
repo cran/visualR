@@ -2,7 +2,7 @@
 % Please edit documentation in R/visual.R
 \name{visual}
 \alias{visual}
-\title{Visual Aux Function}
+\title{Visual Auxiliary Function}
 \usage{
 visual(type, parameter, s, si, x1, x2, x3, x4, v1, v2 = v1, v3 = v1,
   v4 = v1, ti, t1, t2 = t1, t3 = t1, t4 = t1, r = 0.02, d = 0,

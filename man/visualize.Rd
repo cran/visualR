@@ -2,12 +2,14 @@
 % Please edit documentation in R/visualize.R
 \name{visualize}
 \alias{visualize}
-\title{Visualize Option Parameter}
+\title{Option Parameter Visualization}
 \usage{
 visualize(type, parameter, s, si, x1, x2, x3, x4, v1, v2 = v1, v3 = v1,
   v4 = v1, ti, r = 0.02, d = 0, ls = 1, low = 75, high = 125,
-  e1 = (45/365), e2 = (30/365), e3 = (15/365), e4 = (1/365),
-  c1 = 1, c2 = 1, c3 = 1, c4 = 1)
+  e1 = (0), e2 = (5/365), e3 = (10/365), e4 = (15/365),
+  e5 = (20/365), e6 = (25/365), e7 = (30/365), e8 = (35/365),
+  e9 = (40/365), e10 = (45/365), c1 = 1, c2 = 1, c3 = 1,
+  c4 = 1)
 }
 \arguments{
 \item{type}{Character String: "call" or "put"}
@@ -46,13 +48,25 @@ visualize(type, parameter, s, si, x1, x2, x3, x4, v1, v2 = v1, v3 = v1,
 
 \item{high}{Upper Limit for the price range}
 
-\item{e1}{Expiration, in years. Set to 45/365}
+\item{e1}{Expiration in years, set to 0}
 
-\item{e2}{Expiration, in years. Set to 30/365}
+\item{e2}{Expiration in years, set to 5/365}
 
-\item{e3}{Expiration, in years. Set to 15/365}
+\item{e3}{Expiration in years, set to 10/365}
 
-\item{e4}{Expiration, in years. Set to 1/365}
+\item{e4}{Expiration in years, set to 15/365}
+
+\item{e5}{Expiration in years, set to 20/365}
+
+\item{e6}{Expiration in years, set to 25/365}
+
+\item{e7}{Expiration in years, set to 30/365}
+
+\item{e8}{Expiration in years, set to 35/365}
+
+\item{e9}{Expiration in years, set to 40/365}
+
+\item{e10}{Expiration in years, set to 45/365}
 
 \item{c1}{Option 1, Number of Contracts}
 
@@ -63,10 +77,10 @@ visualize(type, parameter, s, si, x1, x2, x3, x4, v1, v2 = v1, v3 = v1,
 \item{c4}{Option 4, Number of Contracts}
 }
 \value{
-Returns a 3d Graph in the Viewer tab
+Plots a 3d Graph in the Viewer tab
 }
 \description{
-Creates a 3D Plot of an Option Parameter over time
+Creates a 3D Plot of an Option Parameter plotted over time
 }
 \examples{
 visualize(type = "put", parameter = "delta", s = 100, si = 100,
@@ -74,5 +88,6 @@ visualize(type = "put", parameter = "delta", s = 100, si = 100,
     ti = 45/365, r = 0.02, d = 0, ls = 1,
     low = 75, high = 125, e1 =(45/365), e2 = (30/365),
     e3 = (15/365), e4 = (1/365), c1 = 1, c2 = 1, c3 = 1, c4 = 1)
+
 
 }

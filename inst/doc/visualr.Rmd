@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-
+#### Visualize
 
 This package utilizes functionality from the package "optionstrat" and "plotly" to produce
 a 3D graph plotting a selected option parameter over time for a double vertical option spread. The available parameters are the option premium or an option greek such as delta, gamma, vega, theta or rho. A double vertical option spread is an option strategy composed of 4 options of the same type (calls or puts) with different strike prices, the highest and lowest strike option are typically long while the middle two are short. The double vertical spread is also known as an "Iron Condor", or an "Iron Butterfly" if the middle two options have the same strike.
@@ -49,3 +49,8 @@ a 3D graph plotting a selected option parameter over time for a double vertical 
 - `c2` Option 2, Number of Contracts
 - `c3` Option 3, Number of Contracts
 - `c4` Option 4, Number of Contracts
+
+#### volskew
+
+This function produces a 3d Plot of the volatility skew any publicly traded corporation or index.
+It plots the implied volatility of option contracts of five expirations, the expirations used are the contracts closest to 5, 15, 25, 35 and 45 days to expiration.

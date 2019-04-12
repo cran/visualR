@@ -1,4 +1,4 @@
-#' Visual Aux Function
+#' Visual Auxiliary Function
 #'
 #' Calculates the net parameter value for a double vertical option spread
 #'
