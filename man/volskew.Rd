@@ -4,9 +4,9 @@
 \alias{volskew}
 \title{Volatility Skew Visualization}
 \usage{
-volskew(symbol, type = "call", spot = "current", r, ll = 0.75,
-  ul = 1.25, days_out = 50, d1 = 0, d2 = 0, d3 = 0, d4 = 0,
-  d5 = 0)
+volskew(symbol, type = "call", spot = "current", r = 0.02,
+  ll = 0.9, ul = 1.1, days_out = 50, d1 = 0, d2 = 0, d3 = 0,
+  d4 = 0, d5 = 0)
 }
 \arguments{
 \item{symbol}{Ticker symbol for a publicly traded company}
@@ -17,9 +17,9 @@ volskew(symbol, type = "call", spot = "current", r, ll = 0.75,
 
 \item{r}{risk-free rate, annualized and continuously-compounded}
 
-\item{ll}{lower limit, set to 0.75}
+\item{ll}{lower limit, set to 0.90}
 
-\item{ul}{upper limit, set to 1.25}
+\item{ul}{upper limit, set to 1.10}
 
 \item{days_out}{keep at 50}
 
@@ -40,5 +40,5 @@ Plots a 3d Graph in the Viewer tab
 Creates a 3D Plot of the Volatility Skew
 }
 \examples{
-volskew("^SPX", type = "call", spot = 2900, r = 0.02)
+volskew("^SPX", type = "call")
 }

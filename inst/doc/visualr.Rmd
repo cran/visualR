@@ -53,4 +53,7 @@ a 3D graph plotting a selected option parameter over time for a double vertical 
 #### volskew
 
 This function produces a 3d Plot of the volatility skew any publicly traded corporation or index.
-It plots the implied volatility of option contracts of five expirations, the expirations used are the contracts closest to 5, 15, 25, 35 and 45 days to expiration.
+It plots the implied volatility of option contracts of five expirations, the expirations used are the contracts closest to 5, 15, 25, 35 and 45 days to expiration. Only contracts with a strike between the current spot price multiplied by the lower limit and the upper limit will be used in the plot.
+
+
+

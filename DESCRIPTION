@@ -2,7 +2,7 @@ Package: visualR
 Type: Package
 Title: Generates a 3D Visualization of Volatility Skew and Stock Option
         Parameters Plotted Over Time
-Version: 2.0.0
+Version: 2.0.1
 Author: John T. Buynak
 Maintainer: John T. Buynak <jbuynak94@gmail.com>
 Description: Generates a 3D graph which plots the volatility skew of a stock or a selected stock option parameter over time.
@@ -10,11 +10,12 @@ Description: Generates a 3D graph which plots the volatility skew of a stock or 
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.5), optionstrat, plotly, dplyr, quantmod, jsonlite
+Depends: R (>= 3.5), optionstrat, quantmod
+Imports: dplyr, jsonlite, plotly, zoo
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
 NeedsCompilation: no
-Packaged: 2019-04-11 23:23:03 UTC; John Buynak
+Packaged: 2019-05-05 18:36:27 UTC; John Buynak
 Repository: CRAN
-Date/Publication: 2019-04-12 10:52:47 UTC
+Date/Publication: 2019-05-05 20:00:03 UTC

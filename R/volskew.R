@@ -6,8 +6,8 @@
 #' @param type "call" or "put" option volatility skew
 #' @param spot This is the current price of the stock, if blank it defaults to the previous adjusted close
 #' @param r risk-free rate, annualized and continuously-compounded
-#' @param ll lower limit, set to 0.75
-#' @param ul upper limit, set to 1.25
+#' @param ll lower limit, set to 0.90
+#' @param ul upper limit, set to 1.10
 #' @param days_out keep at 50
 #' @param d1 dividend yield
 #' @param d2 dividend yield
@@ -21,16 +21,17 @@
 #' @importFrom plotly plot_ly
 #' @importFrom plotly add_surface
 #' @importFrom plotly layout
-#' @importFrom dplyr inner_join
-#' @importFrom dplyr filter
+#' @importFrom dplyr left_join
+#' @importFrom dplyr full_join
 #' @importFrom quantmod getOptionChain
 #' @importFrom quantmod getSymbols
 #' @importFrom optionstrat iv.calc
 #' @importFrom utils tail
+#' @importFrom zoo na.locf
 #'
 #'
-#' @examples volskew("^SPX", type = "call", spot = 2900, r = 0.02)
-volskew <- function(symbol, type = "call", spot = "current", r, ll = 0.75, ul = 1.25,
+#' @examples volskew("^SPX", type = "call")
+volskew <- function(symbol, type = "call", spot = "current", r = 0.02, ll = 0.90, ul = 1.10,
                     days_out = 50, d1 = 0, d2 = 0, d3 = 0, d4 = 0, d5 = 0){
 
   today <- Sys.Date()
@@ -49,6 +50,7 @@ volskew <- function(symbol, type = "call", spot = "current", r, ll = 0.75, ul = 
   }else{
     spot <- spot
   }
+
 
 
   available <- avoc(symbol)
@@ -87,11 +89,92 @@ volskew <- function(symbol, type = "call", spot = "current", r, ll = 0.75, ul = 
   chain4 <- getOptionChain(symbol, aoc_df$aoc[4])
   chain5 <- getOptionChain(symbol, aoc_df$aoc[5])
 
+
   chain1c <- chain1$calls[,c(1,2)]
   chain2c <- chain2$calls[,c(1,2)]
   chain3c <- chain3$calls[,c(1,2)]
   chain4c <- chain4$calls[,c(1,2)]
   chain5c <- chain5$calls[,c(1,2)]
+
+  #Filter by lower and upper Strike limit
+
+  chain1c <- chain1c[chain1c$Strike>= (ll * spot) & chain1c$Strike <= (ul * spot), ]
+  chain2c <- chain2c[chain2c$Strike>= (ll * spot) & chain2c$Strike <= (ul * spot), ]
+  chain3c <- chain3c[chain3c$Strike>= (ll * spot) & chain3c$Strike <= (ul * spot), ]
+  chain4c <- chain4c[chain4c$Strike>= (ll * spot) & chain4c$Strike <= (ul * spot), ]
+  chain5c <- chain5c[chain5c$Strike>= (ll * spot) & chain5c$Strike <= (ul * spot), ]
+
+
+
+
+  for(i in 1:nrow(chain1c)){
+    chain1c$IV[i] <- iv.calc(type = "call", price = chain1c[i,2], s= spot, x = chain1c[i,1],
+                             t= exp1, r = r, d = d1)
+  }
+
+  for(i in 1:nrow(chain2c)){
+    chain2c$IV[i] <- iv.calc(type = "call", price = chain2c[i,2], s= spot, x = chain2c[i,1],
+                             t= exp1, r = r, d = d1)
+  }
+
+  for(i in 1:nrow(chain3c)){
+    chain3c$IV[i] <- iv.calc(type = "call", price = chain3c[i,2], s= spot, x = chain3c[i,1],
+                             t= exp1, r = r, d = d1)
+  }
+
+  for(i in 1:nrow(chain4c)){
+    chain4c$IV[i] <- iv.calc(type = "call", price = chain4c[i,2], s= spot, x = chain4c[i,1],
+                             t= exp1, r = r, d = d1)
+  }
+
+  for(i in 1:nrow(chain5c)){
+    chain5c$IV[i] <- iv.calc(type = "call", price = chain5c[i,2], s= spot, x = chain5c[i,1],
+                             t= exp1, r = r, d = d1)
+  }
+
+
+  #change to rbind for Strikes
+  Callmerge <- full_join(chain1c, full_join(chain2c, full_join(chain3c,
+                                                               full_join(chain4c, chain5c, by = "Strike"), by = "Strike"), by = "Strike")
+                         , by = "Strike")
+
+
+
+
+  Callstrikes <- Callmerge[,1]
+  Callstrikes <- data.frame(Strike = sort(unique(Callstrikes)))
+
+
+
+  Calljoin <- left_join(Callstrikes, chain1c, by = "Strike")
+  Calljoin <- left_join(Calljoin, chain2c, by = "Strike")
+  Calljoin <- left_join(Calljoin, chain3c, by = "Strike")
+  Calljoin <- left_join(Calljoin, chain4c, by = "Strike")
+  Calljoin <- left_join(Calljoin, chain5c, by = "Strike")
+
+  Calljoin[,3] <- na.locf(Calljoin[,3], na.rm = F)
+  Calljoin[,3] <- na.locf(Calljoin[,3], na.rm = F, fromLast= TRUE)
+
+  Calljoin[,5] <- na.locf(Calljoin[,5], na.rm = F)
+  Calljoin[,5] <- na.locf(Calljoin[,5], na.rm = F, fromLast= TRUE)
+
+  Calljoin[,7] <- na.locf(Calljoin[,7], na.rm = F)
+  Calljoin[,7] <- na.locf(Calljoin[,7], na.rm = F, fromLast= TRUE)
+
+  Calljoin[,9] <- na.locf(Calljoin[,9], na.rm = F)
+  Calljoin[,9] <- na.locf(Calljoin[,9], na.rm = F, fromLast= TRUE)
+
+  Calljoin[,11] <- na.locf(Calljoin[,11], na.rm = F)
+  Calljoin[,11] <- na.locf(Calljoin[,11], na.rm = F, fromLast= TRUE)
+  #temp1 <- na.locf(temp1, fromLast = TRUE)
+
+  #print(Calljoin)
+
+  #print(Calljoin)
+
+  #iv.calc(s= 2900, x = 2865, price = 47.95, type = "call", r = 0.02, t = 5/365)
+
+  #Puts
 
   chain1p <- chain1$puts[,c(1,2)]
   chain2p <- chain2$puts[,c(1,2)]
@@ -99,121 +182,115 @@ volskew <- function(symbol, type = "call", spot = "current", r, ll = 0.75, ul = 
   chain4p <- chain4$puts[,c(1,2)]
   chain5p <- chain5$puts[,c(1,2)]
 
-  cc_12 <- inner_join(chain1c, chain2c, by = "Strike")
-  cc_13 <- inner_join(cc_12, chain3c, by = "Strike")
-  cc_14 <- inner_join(cc_13, chain4c, by = "Strike")
-  cc_15 <- inner_join(cc_14, chain5c, by = "Strike")
-  cc_15 <- cc_15[cc_15$Strike>= (ll * spot) & cc_15$Strike <= (ul * spot), ]
-  #cc_15 <- filter(cc_15, Strike >= ll*spot & Strike <= ul*spot)
 
-  cp_12 <- inner_join(chain1p, chain2p, by = "Strike")
-  cp_13 <- inner_join(cp_12, chain3p, by = "Strike")
-  cp_14 <- inner_join(cp_13, chain4p, by = "Strike")
-  cp_15 <- inner_join(cp_14, chain5p, by = "Strike")
-  cp_15 <- cp_15[cp_15$Strike>= (ll * spot) & cp_15$Strike <= (ul * spot), ]
-  #cp_15 <- filter(cp_15, Strike >= ll*spot & Strike <= ul*spot)
+  chain1p <- chain1p[chain1p$Strike>= (ll * spot) & chain1p$Strike <= (ul * spot), ]
+  chain2p <- chain2p[chain2p$Strike>= (ll * spot) & chain2p$Strike <= (ul * spot), ]
+  chain3p <- chain3p[chain3p$Strike>= (ll * spot) & chain3p$Strike <= (ul * spot), ]
+  chain4p <- chain4p[chain4p$Strike>= (ll * spot) & chain4p$Strike <= (ul * spot), ]
+  chain5p <- chain5p[chain5p$Strike>= (ll * spot) & chain5p$Strike <= (ul * spot), ]
 
-  cc_a <- rep(0, nrow(cc_15))
-  for(i in 1:nrow(cc_15)){
-    cc_a[i] <- iv.calc(type = "call", price = cc_15[i,2], s= spot, x = cc_15[i,1],
-                       t= exp1, r = r, d = d1)
+
+  #IV calc
+
+
+
+  for(i in 1:nrow(chain1p)){
+    chain1p$IV[i] <- iv.calc(type = "put", price = chain1p[i,2], s= spot, x = chain1p[i,1],
+                             t= exp1, r = r, d = d1)
   }
 
-  cc_b <- rep(0, nrow(cc_15))
-  for(i in 1:nrow(cc_15)){
-    cc_b[i] <- iv.calc(type = "call", price = cc_15[i,3], s= spot, x = cc_15[i,1],
-                       t= exp2, r = r, d = d2)
+  for(i in 1:nrow(chain2p)){
+    chain2p$IV[i] <- iv.calc(type = "put", price = chain2p[i,2], s= spot, x = chain2p[i,1],
+                             t= exp1, r = r, d = d1)
   }
 
-  cc_c <- rep(0, nrow(cc_15))
-  for(i in 1:nrow(cc_15)){
-    cc_c[i] <- iv.calc(type = "call", price = cc_15[i,4], s= spot, x = cc_15[i,1],
-                       t= exp3, r = r, d = d3)
+  for(i in 1:nrow(chain3p)){
+    chain3p$IV[i] <- iv.calc(type = "put", price = chain3p[i,2], s= spot, x = chain3p[i,1],
+                             t= exp1, r = r, d = d1)
   }
 
-  cc_d <- rep(0, nrow(cc_15))
-  for(i in 1:nrow(cc_15)){
-    cc_d[i] <- iv.calc(type = "call", price = cc_15[i,5], s= spot, x = cc_15[i,1],
-                       t= exp4, r = r, d = d4)
+  for(i in 1:nrow(chain4p)){
+    chain4p$IV[i] <- iv.calc(type = "put", price = chain4p[i,2], s= spot, x = chain4p[i,1],
+                             t= exp1, r = r, d = d1)
   }
 
-  cc_e <- rep(0, nrow(cc_15))
-  for(i in 1:nrow(cc_15)){
-    cc_e[i] <- iv.calc(type = "call", price = cc_15[i,6], s= spot, x = cc_15[i,1],
-                       t= exp5, r = r, d = d5)
+  for(i in 1:nrow(chain5p)){
+    chain5p$IV[i] <- iv.calc(type = "put", price = chain5p[i,2], s= spot, x = chain5p[i,1],
+                             t= exp1, r = r, d = d1)
   }
 
 
+  #Strike Merge
+  Putmerge <- full_join(chain1p, full_join(chain2p, full_join(chain3p,
+                                                              full_join(chain4p, chain5p, by = "Strike"),
+                                                              by = "Strike"), by = "Strike"), by = "Strike")
+
+  Putstrikes <- Putmerge[,1]
+  Putstrikes <- data.frame(Strike = sort(unique(Putstrikes)))
 
 
-  cp_a <- rep(0, nrow(cp_15))
-  for(i in 1:nrow(cp_15)){
-    cp_a[i] <- iv.calc(type = "put", price = cp_15[i,2], s= spot, x = cp_15[i,1],
-                       t= exp1, r = r, d = d1)
+  Putjoin <- left_join(Putstrikes, chain1p, by = "Strike")
+  Putjoin <- left_join(Putjoin, chain2p, by = "Strike")
+  Putjoin <- left_join(Putjoin, chain3p, by = "Strike")
+  Putjoin <- left_join(Putjoin, chain4p, by = "Strike")
+  Putjoin <- left_join(Putjoin, chain5p, by = "Strike")
+
+  Putjoin[,3] <- na.locf(Putjoin[,3], na.rm = F)
+  Putjoin[,3] <- na.locf(Putjoin[,3], na.rm = F, fromLast= TRUE)
+
+  Putjoin[,5] <- na.locf(Putjoin[,5], na.rm = F)
+  Putjoin[,5] <- na.locf(Putjoin[,5], na.rm = F, fromLast= TRUE)
+
+  Putjoin[,7] <- na.locf(Putjoin[,7], na.rm = F)
+  Putjoin[,7] <- na.locf(Putjoin[,7], na.rm = F, fromLast= TRUE)
+
+  Putjoin[,9] <- na.locf(Putjoin[,9], na.rm = F)
+  Putjoin[,9] <- na.locf(Putjoin[,9], na.rm = F, fromLast= TRUE)
+
+  Putjoin[,11] <- na.locf(Putjoin[,11], na.rm = F)
+  Putjoin[,11] <- na.locf(Putjoin[,11], na.rm = F, fromLast= TRUE)
+
+
+
+
+  cc <- cbind(Calljoin[,3],Calljoin[,5],Calljoin[,7],Calljoin[,9],Calljoin[,11])
+  cp <- cbind(Putjoin[,3],Putjoin[,5],Putjoin[,7],Putjoin[,9],Putjoin[,11])
+
+
+
+  if(type == "call"){
+    layout(add_surface(plot_ly(showscale = FALSE, z = ~cc)),
+           title = "Volatility Skew",
+           scene = list(
+             xaxis = list(title = "Time to Expiration", ticketmode = 'array',
+                          ticktext = c(aoc_df$remain[1],aoc_df$remain[2],aoc_df$remain[3],
+                                       aoc_df$remain[4],aoc_df$remain[5]),
+                          tickvals = c(0,1,2,3,4)),
+             yaxis = list(title = "Strike Price",ticketmode = 'array',
+                          ticktext = Calljoin$Strike,
+                          tickvals = c(0:nrow(Calljoin)),
+                          size = 5),
+             zaxis = list(title = "Implied Volatility")
+           ))
+
+
+  }else{
+    layout(add_surface(plot_ly(showscale = FALSE, z = ~cp)),
+           title = paste("Volatility Skew",type, "option"),
+           scene = list(
+             xaxis = list(title = "Time to Expiration", ticketmode = 'array',
+                          ticktext = c(aoc_df$remain[1],aoc_df$remain[2],aoc_df$remain[3],
+                                       aoc_df$remain[4],aoc_df$remain[5]),
+                          tickvals = c(0,1,2,3,4)),
+             yaxis = list(title = "Strike Price",ticketmode = 'array',
+                          ticktext = Putjoin$Strike,
+                          tickvals = c(0:nrow(Putjoin)),
+                          size = 5),
+             zaxis = list(title = "Implied Volatility")
+           ))
+
+
+
   }
-
-  cp_b <- rep(0, nrow(cp_15))
-  for(i in 1:nrow(cp_15)){
-    cp_b[i] <- iv.calc(type = "put", price = cp_15[i,3], s= spot, x = cp_15[i,1],
-                       t= exp2, r = r, d = d2)
-  }
-
-  cp_c <- rep(0, nrow(cp_15))
-  for(i in 1:nrow(cp_15)){
-    cp_c[i] <- iv.calc(type = "put", price = cp_15[i,4], s= spot, x = cp_15[i,1],
-                       t= exp3, r = r, d = d3)
-  }
-
-  cp_d <- rep(0, nrow(cp_15))
-  for(i in 1:nrow(cp_15)){
-    cp_d[i] <- iv.calc(type = "put", price = cp_15[i,5], s= spot, x = cp_15[i,1],
-                       t= exp4, r = r, d = d4)
-  }
-
-  cp_e <- rep(0, nrow(cp_15))
-  for(i in 1:nrow(cp_15)){
-    cp_e[i] <- iv.calc(type = "put", price = cp_15[i,6], s= spot, x = cp_15[i,1],
-                       t= exp5, r = r, d = d5)
-  }
-
-  cc <- cbind(cc_a, cc_b, cc_c, cc_d, cc_e)
-  cp <- cbind(cp_a, cp_b, cp_c, cp_d, cp_e)
-
-
-
-    if(type == "call"){
-      layout(add_surface(plot_ly(showscale = FALSE, z = ~cc)),
-             title = "Volatility Skew",
-             scene = list(
-               xaxis = list(title = "Time to Expiration", ticketmode = 'array',
-                            ticktext = c(aoc_df$remain[1],aoc_df$remain[2],aoc_df$remain[3],
-                                         aoc_df$remain[4],aoc_df$remain[5]),
-                            tickvals = c(0,1,2,3,4)),
-               yaxis = list(title = "Strike Price",ticketmode = 'array',
-                            ticktext = cc_15$Strike,
-                            tickvals = c(0:nrow(cc_15)),
-                            size = 5),
-               zaxis = list(title = "Implied Volatility")
-             ))
-
-
-    }else{
-      layout(add_surface(plot_ly(showscale = FALSE, z = ~cp)),
-             title = paste("Volatility Skew",type, "option"),
-             scene = list(
-               xaxis = list(title = "Time to Expiration", ticketmode = 'array',
-                            ticktext = c(aoc_df$remain[1],aoc_df$remain[2],aoc_df$remain[3],
-                                         aoc_df$remain[4],aoc_df$remain[5]),
-                            tickvals = c(0,1,2,3,4)),
-               yaxis = list(title = "Strike Price",ticketmode = 'array',
-                            ticktext = cp_15$Strike,
-                            tickvals = c(0:nrow(cp_15)),
-                            size = 5),
-               zaxis = list(title = "Implied Volatility")
-             ))
-
-
-
-    }
 
 }
