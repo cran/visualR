@@ -4,12 +4,13 @@
 \alias{visualize}
 \title{Option Parameter Visualization}
 \usage{
-visualize(type, parameter, s, si, x1, x2, x3, x4, v1, v2 = v1, v3 = v1,
-  v4 = v1, ti, r = 0.02, d = 0, ls = 1, low = 75, high = 125,
-  e1 = (0), e2 = (5/365), e3 = (10/365), e4 = (15/365),
-  e5 = (20/365), e6 = (25/365), e7 = (30/365), e8 = (35/365),
-  e9 = (40/365), e10 = (45/365), c1 = 1, c2 = 1, c3 = 1,
-  c4 = 1)
+visualize(type = "call", parameter = "premium", s = 100, si = 100,
+  x1 = 90, x2 = 95, x3 = 105, x4 = 110, v1 = 0.2, v2 = v1,
+  v3 = v1, v4 = v1, ti = 45/365, r = 0.02, d = 0, ls = 1,
+  low = 75, high = 125, e1 = (0), e2 = (5/365), e3 = (10/365),
+  e4 = (15/365), e5 = (20/365), e6 = (25/365), e7 = (30/365),
+  e8 = (35/365), e9 = (40/365), e10 = (45/365), c1 = 1, c2 = 1,
+  c3 = 1, c4 = 1)
 }
 \arguments{
 \item{type}{Character String: "call" or "put"}

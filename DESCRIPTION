@@ -1,8 +1,7 @@
 Package: visualR
 Type: Package
-Title: Generates a 3D Visualization of Volatility Skew and Stock Option
-        Parameters Plotted Over Time
-Version: 2.0.1
+Title: 3D Visualization of Option Greeks and Volatility Skew
+Version: 2.0.2
 Author: John T. Buynak
 Maintainer: John T. Buynak <jbuynak94@gmail.com>
 Description: Generates a 3D graph which plots the volatility skew of a stock or a selected stock option parameter over time.
@@ -16,6 +15,6 @@ Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
 NeedsCompilation: no
-Packaged: 2019-05-05 18:36:27 UTC; John Buynak
+Packaged: 2019-08-20 21:58:47 UTC; John Buynak
 Repository: CRAN
-Date/Publication: 2019-05-05 20:00:03 UTC
+Date/Publication: 2019-08-20 22:20:02 UTC
